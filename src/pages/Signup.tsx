@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff, Check } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Check, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -19,10 +21,30 @@ const Signup = () => {
     confirmPassword: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signup attempt:", formData);
-    // Handle signup logic here
+    
+    if (formData.password !== formData.confirmPassword) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await signUp(
+      formData.email, 
+      formData.password, 
+      formData.firstName, 
+      formData.lastName
+    );
+    
+    if (!error) {
+      navigate("/login");
+    }
+    
+    setIsLoading(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,6 +60,10 @@ const Signup = () => {
     { text: "Contains lowercase letter", met: /[a-z]/.test(formData.password) },
     { text: "Contains number", met: /\d/.test(formData.password) }
   ];
+
+  const isFormValid = passwordRequirements.every(req => req.met) && 
+                     formData.password === formData.confirmPassword &&
+                     formData.firstName && formData.lastName && formData.email;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center px-4 py-8">
@@ -74,6 +100,7 @@ const Signup = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     required
+                    disabled={isLoading}
                     className="focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -87,6 +114,7 @@ const Signup = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                     required
+                    disabled={isLoading}
                     className="focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -102,6 +130,7 @@ const Signup = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  disabled={isLoading}
                   className="focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -117,12 +146,14 @@ const Signup = () => {
                     value={formData.password}
                     onChange={handleChange}
                     required
+                    disabled={isLoading}
                     className="focus:ring-2 focus:ring-blue-500 pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -153,12 +184,14 @@ const Signup = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
+                    disabled={isLoading}
                     className="focus:ring-2 focus:ring-blue-500 pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    disabled={isLoading}
                   >
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -173,6 +206,7 @@ const Signup = () => {
                   id="terms"
                   type="checkbox"
                   required
+                  disabled={isLoading}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
                 />
                 <Label htmlFor="terms" className="text-sm text-gray-600">
@@ -189,10 +223,17 @@ const Signup = () => {
 
               <Button
                 type="submit"
+                disabled={!isFormValid || isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white py-2.5"
-                disabled={formData.password !== formData.confirmPassword || !passwordRequirements.every(req => req.met)}
               >
-                Create Account
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  'Create Account'
+                )}
               </Button>
             </form>
 
