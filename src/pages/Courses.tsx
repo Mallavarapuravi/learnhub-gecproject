@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Star, Users, Clock, Search, User, Play } from "lucide-react";
+import { Star, Users, Clock, Search, User, Play, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -17,7 +17,7 @@ const Courses = () => {
   const courses = [
     {
       id: 1,
-      title: "Complete Web Development Bootcamp",
+      title: "Complete Web Development Bootcamp 2024",
       instructor: "Sarah Johnson",
       rating: 4.9,
       students: 12847,
@@ -26,11 +26,13 @@ const Courses = () => {
       price: 89,
       category: "Web Development",
       level: "Beginner to Advanced",
-      description: "Learn HTML, CSS, JavaScript, React, Node.js and more in this comprehensive bootcamp."
+      description: "Master HTML, CSS, JavaScript, React, Node.js, MongoDB, and deploy full-stack applications. Build 10+ real projects.",
+      youtubePreview: "https://www.youtube.com/embed/qz0aGYrrlhU",
+      features: ["10+ Real Projects", "Lifetime Access", "Certificate", "24/7 Support"]
     },
     {
       id: 2,
-      title: "Data Science and Machine Learning",
+      title: "Data Science & Machine Learning Mastery",
       instructor: "Dr. Michael Chen",
       rating: 4.8,
       students: 8934,
@@ -39,11 +41,13 @@ const Courses = () => {
       price: 119,
       category: "Data Science",
       level: "Intermediate",
-      description: "Master Python, pandas, scikit-learn, and deep learning techniques."
+      description: "Learn Python, Pandas, NumPy, Scikit-learn, TensorFlow, and deploy ML models. Real industry projects included.",
+      youtubePreview: "https://www.youtube.com/embed/7eh4d6sabA0",
+      features: ["5+ ML Projects", "Industry Datasets", "Career Support", "Code Templates"]
     },
     {
       id: 3,
-      title: "Digital Marketing Masterclass",
+      title: "Digital Marketing Complete Course",
       instructor: "Emily Rodriguez",
       rating: 4.7,
       students: 15623,
@@ -52,11 +56,13 @@ const Courses = () => {
       price: 79,
       category: "Marketing",
       level: "All Levels",
-      description: "Learn SEO, social media marketing, PPC, and conversion optimization."
+      description: "Master SEO, Google Ads, Facebook Marketing, Content Marketing, Email Marketing, and Analytics.",
+      youtubePreview: "https://www.youtube.com/embed/gvBkDN-7cuA",
+      features: ["Live Case Studies", "Marketing Tools", "Templates", "Community Access"]
     },
     {
       id: 4,
-      title: "Python Programming Fundamentals",
+      title: "Python Programming - Zero to Hero",
       instructor: "Alex Thompson",
       rating: 4.9,
       students: 9876,
@@ -65,11 +71,13 @@ const Courses = () => {
       price: 69,
       category: "Programming",
       level: "Beginner",
-      description: "Start your programming journey with Python - from basics to advanced concepts."
+      description: "Complete Python course covering basics to advanced topics: OOP, file handling, APIs, web scraping, and automation.",
+      youtubePreview: "https://www.youtube.com/embed/_uQrJ0TkZlc",
+      features: ["50+ Exercises", "5 Major Projects", "Code Challenges", "Job Prep"]
     },
     {
       id: 5,
-      title: "UI/UX Design Complete Course",
+      title: "UI/UX Design Masterclass",
       instructor: "Jessica Park",
       rating: 4.8,
       students: 7654,
@@ -78,7 +86,9 @@ const Courses = () => {
       price: 99,
       category: "Design",
       level: "Intermediate",
-      description: "Master design thinking, prototyping, and create stunning user experiences."
+      description: "Learn Figma, Adobe XD, design systems, user research, prototyping, and create stunning user experiences.",
+      youtubePreview: "https://www.youtube.com/embed/c9Wg6Cb_YlU",
+      features: ["Design Portfolio", "Figma Mastery", "Client Projects", "Design System"]
     },
     {
       id: 6,
@@ -91,7 +101,9 @@ const Courses = () => {
       price: 109,
       category: "Mobile Development",
       level: "Advanced",
-      description: "Build cross-platform mobile apps with React Native and Expo."
+      description: "Build cross-platform mobile apps with React Native, Expo, Firebase, and publish to App Store & Play Store.",
+      youtubePreview: "https://www.youtube.com/embed/0-S5a0eXPoc",
+      features: ["3 Complete Apps", "App Store Deployment", "Firebase Integration", "Navigation"]
     }
   ];
 
@@ -118,7 +130,7 @@ const Courses = () => {
             Explore Our Courses
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover thousands of courses from expert instructors and advance your skills
+            Learn from industry experts with hands-on projects, lifetime access, and career support
           </p>
         </div>
 
@@ -176,63 +188,90 @@ const Courses = () => {
         </div>
 
         {/* Course Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {filteredCourses.map((course) => (
             <Card key={course.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-blue-100 to-emerald-100 relative overflow-hidden">
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <Button size="sm" className="bg-white text-gray-900 hover:bg-gray-100">
-                    <Play className="h-4 w-4 mr-2" />
-                    Preview
-                  </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+                {/* Course Video Preview */}
+                <div className="aspect-video bg-gradient-to-br from-blue-100 to-emerald-100 rounded-lg overflow-hidden relative">
+                  <iframe
+                    src={course.youtubePreview}
+                    title={course.title}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                  <div className="absolute top-3 left-3">
+                    <Badge className="bg-emerald-500 text-white">{course.level}</Badge>
+                  </div>
+                  <div className="absolute top-3 right-3">
+                    <Badge variant="secondary">{course.category}</Badge>
+                  </div>
                 </div>
-                <div className="absolute top-3 left-3">
-                  <Badge className="bg-emerald-500 text-white">{course.level}</Badge>
-                </div>
-                <div className="absolute top-3 right-3">
-                  <Badge variant="secondary">{course.category}</Badge>
+
+                {/* Course Details */}
+                <div className="flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      {course.description}
+                    </p>
+                    
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                      <User className="h-4 w-4" />
+                      <span>{course.instructor}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">{course.rating}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span>{course.students.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{course.duration}</span>
+                      </div>
+                    </div>
+
+                    {/* Course Features */}
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {course.features.map((feature, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {feature}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-emerald-600">
+                      ${course.price}
+                    </span>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open(course.youtubePreview.replace('/embed/', '/watch?v='), '_blank')}
+                      >
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        Preview
+                      </Button>
+                      <Button className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white">
+                        Enroll Now
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg leading-tight group-hover:text-blue-600 transition-colors">
-                  {course.title}
-                </CardTitle>
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {course.description}
-                </p>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                  <User className="h-4 w-4" />
-                  <span>{course.instructor}</span>
-                </div>
-                
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{course.rating}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span>{course.students.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{course.duration}</span>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-emerald-600">
-                    ${course.price}
-                  </span>
-                  <Button className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white">
-                    Enroll Now
-                  </Button>
-                </div>
-              </CardContent>
             </Card>
           ))}
         </div>

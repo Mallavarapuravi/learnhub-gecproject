@@ -2,33 +2,90 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Book, Users, Clock, ArrowRight, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowRight, Users, BookOpen } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCategories } from "@/hooks/useCategories";
 
 const Categories = () => {
-  const { data: categories, isLoading, error } = useCategories();
+  const { data: categories, isLoading } = useCategories();
+
+  const categoryDetails = [
+    {
+      name: "Web Development",
+      description: "Master modern web technologies including HTML5, CSS3, JavaScript, React, Node.js, and full-stack development",
+      courses: 45,
+      students: 12500,
+      skills: ["HTML & CSS", "JavaScript", "React", "Node.js", "Databases"],
+      color: "from-blue-500 to-blue-600"
+    },
+    {
+      name: "Data Science",
+      description: "Learn Python, machine learning, data analysis, AI, and statistical modeling for data-driven decisions",
+      courses: 32,
+      students: 8900,
+      skills: ["Python", "Machine Learning", "Statistics", "Data Visualization", "AI"],
+      color: "from-emerald-500 to-emerald-600"
+    },
+    {
+      name: "Digital Marketing",
+      description: "Master SEO, social media marketing, Google Ads, content marketing, and digital growth strategies",
+      courses: 28,
+      students: 15600,
+      skills: ["SEO", "Google Ads", "Social Media", "Content Marketing", "Analytics"],
+      color: "from-purple-500 to-purple-600"
+    },
+    {
+      name: "Design",
+      description: "Create stunning UI/UX designs, learn Figma, Adobe Creative Suite, and design thinking methodologies",
+      courses: 24,
+      students: 7800,
+      skills: ["UI/UX Design", "Figma", "Adobe Suite", "Prototyping", "Design Systems"],
+      color: "from-pink-500 to-pink-600"
+    },
+    {
+      name: "Business & Management",
+      description: "Develop leadership skills, project management, entrepreneurship, and strategic business planning",
+      courses: 19,
+      students: 6200,
+      skills: ["Leadership", "Project Management", "Strategy", "Entrepreneurship", "Finance"],
+      color: "from-orange-500 to-orange-600"
+    },
+    {
+      name: "Photography",
+      description: "Master digital photography, photo editing, lighting techniques, and visual storytelling",
+      courses: 16,
+      students: 4300,
+      skills: ["Digital Photography", "Lightroom", "Photoshop", "Composition", "Editing"],
+      color: "from-indigo-500 to-indigo-600"
+    },
+    {
+      name: "Programming",
+      description: "Learn programming fundamentals with Python, Java, C++, and software development best practices",
+      courses: 38,
+      students: 11200,
+      skills: ["Python", "Java", "C++", "Algorithms", "Software Engineering"],
+      color: "from-yellow-500 to-yellow-600"
+    },
+    {
+      name: "Personal Development",
+      description: "Enhance communication skills, time management, productivity, and professional growth strategies",
+      courses: 22,
+      students: 9800,
+      skills: ["Communication", "Time Management", "Productivity", "Leadership", "Career Growth"],
+      color: "from-teal-500 to-teal-600"
+    }
+  ];
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
         <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-red-500">Failed to load categories</p>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading categories...</p>
+          </div>
         </div>
         <Footer />
       </div>
@@ -43,72 +100,91 @@ const Categories = () => {
         {/* Page Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Learning Categories
+            Course Categories
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Explore our comprehensive collection of courses across various disciplines. 
-            From technology to creative arts, find the perfect learning path for your goals.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Discover your passion and advance your career with our comprehensive learning paths
           </p>
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {categories?.map((category) => (
-            <Card key={category.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden">
-              <div className={`h-20 bg-gradient-to-r ${category.color} relative`}>
-                <div className="absolute inset-0 bg-black/10" />
-                <div className="absolute bottom-4 left-4 text-3xl">
-                  {category.icon}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {categoryDetails.map((category, index) => (
+            <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden">
+              <CardHeader className="pb-4">
+                <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4`}>
+                  <span className="text-white text-xl font-bold">
+                    {category.name.charAt(0)}
+                  </span>
                 </div>
-              </div>
-              
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg group-hover:text-blue-600 transition-colors">
+                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
                   {category.name}
                 </CardTitle>
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {category.description}
-                </p>
               </CardHeader>
               
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-3 gap-2 text-xs text-gray-500 mb-4">
+              <CardContent className="space-y-4">
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {category.description}
+                </p>
+                
+                <div className="flex items-center justify-between text-sm text-gray-500">
                   <div className="flex items-center gap-1">
-                    <Book className="h-3 w-3" />
-                    <span>{Math.floor(Math.random() * 500) + 50}</span>
+                    <BookOpen className="h-4 w-4" />
+                    <span>{category.courses} courses</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Users className="h-3 w-3" />
-                    <span>{Math.floor(Math.random() * 50) + 10}k</span>
+                    <Users className="h-4 w-4" />
+                    <span>{category.students.toLocaleString()} students</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    <span>{Math.floor(Math.random() * 30) + 15}h</span>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-700">Key Skills:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {category.skills.map((skill, skillIndex) => (
+                      <Badge key={skillIndex} variant="outline" className="text-xs">
+                        {skill}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
                 
-                <Link to="/courses">
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white text-sm">
-                    Explore Courses
-                    <ArrowRight className="ml-2 h-3 w-3" />
-                  </Button>
-                </Link>
+                <Button 
+                  className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white group"
+                  onClick={() => window.location.href = '/courses'}
+                >
+                  Explore Courses
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-emerald-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">
-            Can't Find What You're Looking For?
+        {/* Call to Action */}
+        <div className="text-center bg-white rounded-lg p-12 shadow-sm border">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Ready to Start Learning?
           </h2>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-            We're constantly adding new categories and courses. Suggest a topic you'd like to learn about!
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Join thousands of students who are already advancing their careers with our expert-led courses
           </p>
-          <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-            Request New Category
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white"
+              onClick={() => window.location.href = '/courses'}
+            >
+              Browse All Courses
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => window.location.href = '/signup'}
+            >
+              Create Free Account
+            </Button>
+          </div>
         </div>
       </div>
 
