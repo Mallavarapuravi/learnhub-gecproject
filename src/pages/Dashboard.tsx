@@ -5,13 +5,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Clock, Trophy, User, LogOut } from "lucide-react";
+import { BookOpen, Clock, Trophy, User, LogOut, CreditCard, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useEnrollments } from "@/hooks/useEnrollments";
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const { enrollments, enrollmentRequests } = useEnrollments();
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -28,32 +30,11 @@ const Dashboard = () => {
     enabled: !!user?.id,
   });
 
-  const { data: enrollments } = useQuery({
-    queryKey: ['enrollments', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('enrollments')
-        .select(`
-          *,
-          courses (
-            id,
-            title,
-            description,
-            thumbnail_url,
-            categories (name, icon)
-          )
-        `)
-        .eq('student_id', user!.id);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
   const handleSignOut = async () => {
     await signOut();
   };
+
+  const pendingPayments = enrollmentRequests.filter(req => req.status === 'payment_pending');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
@@ -80,6 +61,36 @@ const Dashboard = () => {
           </Button>
         </div>
 
+        {/* Pending Payments Alert */}
+        {pendingPayments.length > 0 && (
+          <Card className="mb-8 border-orange-200 bg-orange-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="h-5 w-5 text-orange-600" />
+                <h3 className="font-semibold text-orange-800">Pending Payments</h3>
+              </div>
+              <p className="text-orange-700 mb-4">
+                You have {pendingPayments.length} course(s) waiting for payment completion.
+              </p>
+              <div className="space-y-2">
+                {pendingPayments.map((request) => (
+                  <div key={request.id} className="flex items-center justify-between bg-white p-3 rounded-lg">
+                    <div>
+                      <p className="font-medium">{request.courses?.title}</p>
+                      <p className="text-sm text-gray-600">₹{request.courses?.price_inr?.toLocaleString()}</p>
+                    </div>
+                    <Link to="/courses">
+                      <Button size="sm" variant="outline">
+                        Complete Payment
+                      </Button>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -99,13 +110,13 @@ const Dashboard = () => {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Hours Learned
+                <CreditCard className="h-4 w-4" />
+                Pending Payments
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-emerald-600">
-                {Math.floor(Math.random() * 50) + 10}h
+              <div className="text-2xl font-bold text-orange-600">
+                {pendingPayments.length}
               </div>
             </CardContent>
           </Card>

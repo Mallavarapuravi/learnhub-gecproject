@@ -1,18 +1,36 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Star, Users, Clock, Search, User, Play, ExternalLink } from "lucide-react";
+import { Star, Users, Clock, Search, User, Play, ExternalLink, Lock, CheckCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { PaymentModal } from "@/components/PaymentModal";
+import { useEnrollments } from "@/hooks/useEnrollments";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const Courses = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
+  const [paymentModal, setPaymentModal] = useState<{
+    isOpen: boolean;
+    courseId: string;
+    courseTitle: string;
+    amount: number;
+    paymentId?: string;
+  }>({
+    isOpen: false,
+    courseId: '',
+    courseTitle: '',
+    amount: 0
+  });
+
+  const { user } = useAuth();
+  const { enrollments, enrollmentRequests, createEnrollmentRequest, updatePaymentStatus } = useEnrollments();
 
   const courses = [
     {
@@ -24,6 +42,7 @@ const Courses = () => {
       duration: "42 hours",
       image: "/placeholder.svg",
       price: 89,
+      price_inr: 7387, // 89 * 83
       category: "Web Development",
       level: "Beginner to Advanced",
       description: "Master HTML, CSS, JavaScript, React, Node.js, MongoDB, and deploy full-stack applications. Build 10+ real projects.",
@@ -39,6 +58,7 @@ const Courses = () => {
       duration: "36 hours",
       image: "/placeholder.svg",
       price: 119,
+      price_inr: 9877,
       category: "Data Science",
       level: "Intermediate",
       description: "Learn Python, Pandas, NumPy, Scikit-learn, TensorFlow, and deploy ML models. Real industry projects included.",
@@ -54,6 +74,7 @@ const Courses = () => {
       duration: "28 hours",
       image: "/placeholder.svg",
       price: 79,
+      price_inr: 6557,
       category: "Marketing",
       level: "All Levels",
       description: "Master SEO, Google Ads, Facebook Marketing, Content Marketing, Email Marketing, and Analytics.",
@@ -69,6 +90,7 @@ const Courses = () => {
       duration: "32 hours",
       image: "/placeholder.svg",
       price: 69,
+      price_inr: 5727,
       category: "Programming",
       level: "Beginner",
       description: "Complete Python course covering basics to advanced topics: OOP, file handling, APIs, web scraping, and automation.",
@@ -84,6 +106,7 @@ const Courses = () => {
       duration: "38 hours",
       image: "/placeholder.svg",
       price: 99,
+      price_inr: 8217,
       category: "Design",
       level: "Intermediate",
       description: "Learn Figma, Adobe XD, design systems, user research, prototyping, and create stunning user experiences.",
@@ -99,6 +122,7 @@ const Courses = () => {
       duration: "45 hours",
       image: "/placeholder.svg",
       price: 109,
+      price_inr: 9047,
       category: "Mobile Development",
       level: "Advanced",
       description: "Build cross-platform mobile apps with React Native, Expo, Firebase, and publish to App Store & Play Store.",
@@ -118,6 +142,105 @@ const Courses = () => {
     
     return matchesSearch && matchesCategory && matchesLevel;
   });
+
+  const isEnrolled = (courseId: number) => {
+    return enrollments.some(enrollment => enrollment.courses?.id === courseId.toString());
+  };
+
+  const hasEnrollmentRequest = (courseId: number) => {
+    return enrollmentRequests.find(request => request.courses?.id === courseId.toString());
+  };
+
+  const handleEnrollClick = async (course: any) => {
+    if (!user) {
+      return;
+    }
+
+    const enrollmentRequest = hasEnrollmentRequest(course.id);
+    
+    if (enrollmentRequest && enrollmentRequest.status === 'payment_pending') {
+      // Show payment modal for existing request
+      setPaymentModal({
+        isOpen: true,
+        courseId: course.id.toString(),
+        courseTitle: course.title,
+        amount: course.price_inr,
+        paymentId: enrollmentRequest.payments?.id
+      });
+    } else if (!isEnrolled(course.id) && !enrollmentRequest) {
+      // Create new enrollment request
+      try {
+        const result = await createEnrollmentRequest.mutateAsync({
+          courseId: course.id.toString(),
+          amount: course.price_inr
+        });
+        
+        setPaymentModal({
+          isOpen: true,
+          courseId: course.id.toString(),
+          courseTitle: course.title,
+          amount: course.price_inr,
+          paymentId: result.payment.id
+        });
+      } catch (error) {
+        console.error('Failed to create enrollment request:', error);
+      }
+    }
+  };
+
+  const handlePaymentComplete = async (transactionId: string, method: string) => {
+    if (paymentModal.paymentId) {
+      await updatePaymentStatus.mutateAsync({
+        paymentId: paymentModal.paymentId,
+        transactionId,
+        method
+      });
+    }
+  };
+
+  const getEnrollButtonContent = (course: any) => {
+    if (!user) {
+      return (
+        <Link to="/login">
+          <Button className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white">
+            Login to Enroll
+          </Button>
+        </Link>
+      );
+    }
+
+    if (isEnrolled(course.id)) {
+      return (
+        <Button disabled className="bg-green-100 text-green-800 border border-green-300">
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Enrolled
+        </Button>
+      );
+    }
+
+    const enrollmentRequest = hasEnrollmentRequest(course.id);
+    if (enrollmentRequest?.status === 'payment_pending') {
+      return (
+        <Button 
+          onClick={() => handleEnrollClick(course)}
+          variant="outline"
+          className="border-orange-300 text-orange-700 hover:bg-orange-50"
+        >
+          Complete Payment
+        </Button>
+      );
+    }
+
+    return (
+      <Button 
+        onClick={() => handleEnrollClick(course)}
+        className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white"
+        disabled={createEnrollmentRequest.isPending}
+      >
+        {createEnrollmentRequest.isPending ? 'Processing...' : 'Enroll Now'}
+      </Button>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
@@ -194,14 +317,26 @@ const Courses = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
                 {/* Course Video Preview */}
                 <div className="aspect-video bg-gradient-to-br from-blue-100 to-emerald-100 rounded-lg overflow-hidden relative">
-                  <iframe
-                    src={course.youtubePreview}
-                    title={course.title}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                  {!user || !isEnrolled(course.id) ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 relative">
+                      <Lock className="h-12 w-12 text-gray-400" />
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <div className="text-white text-center">
+                          <Lock className="h-8 w-8 mx-auto mb-2" />
+                          <p className="text-sm">Enroll to Access</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <iframe
+                      src={course.youtubePreview}
+                      title={course.title}
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  )}
                   <div className="absolute top-3 left-3">
                     <Badge className="bg-emerald-500 text-white">{course.level}</Badge>
                   </div>
@@ -253,21 +388,26 @@ const Courses = () => {
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-emerald-600">
-                      ${course.price}
-                    </span>
+                    <div className="text-center">
+                      <span className="text-2xl font-bold text-emerald-600">
+                        ₹{course.price_inr.toLocaleString()}
+                      </span>
+                      <div className="text-xs text-gray-500 line-through">
+                        ${course.price}
+                      </div>
+                    </div>
                     <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => window.open(course.youtubePreview.replace('/embed/', '/watch?v='), '_blank')}
-                      >
-                        <ExternalLink className="h-4 w-4 mr-1" />
-                        Preview
-                      </Button>
-                      <Button className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white">
-                        Enroll Now
-                      </Button>
+                      {(user && isEnrolled(course.id)) && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open(course.youtubePreview.replace('/embed/', '/watch?v='), '_blank')}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          Preview
+                        </Button>
+                      )}
+                      {getEnrollButtonContent(course)}
                     </div>
                   </div>
                 </div>
@@ -293,6 +433,14 @@ const Courses = () => {
           </div>
         )}
       </div>
+
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={() => setPaymentModal(prev => ({ ...prev, isOpen: false }))}
+        courseTitle={paymentModal.courseTitle}
+        amount={paymentModal.amount}
+        onPaymentComplete={handlePaymentComplete}
+      />
 
       <Footer />
     </div>
