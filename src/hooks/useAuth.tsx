@@ -56,35 +56,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     
     try {
+      // Use the current window origin for the redirect URL
+      const redirectUrl = `${window.location.origin}/`;
+      
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
-            first_name: firstName,
-            last_name: lastName,
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
           }
         }
       });
 
       if (error) {
         console.error('Signup error:', error);
-        toast.error(error.message);
         return { error };
       }
 
-      console.log('Signup successful:', data);
+      console.log('Signup response:', data);
       
-      if (data.user && !data.user.email_confirmed_at) {
-        toast.success('Account created! Please check your email to confirm your account.');
+      // Check if user was created successfully
+      if (data.user) {
+        if (!data.user.email_confirmed_at) {
+          console.log('User created, email confirmation required');
+          toast.success('Account created! Please check your email to confirm your account.');
+        } else {
+          console.log('User created and confirmed');
+          toast.success('Account created successfully!');
+        }
+        return { error: null };
       } else {
-        toast.success('Account created successfully!');
+        console.error('No user returned from signup');
+        return { error: new Error('Failed to create user account') };
       }
 
-      return { error: null };
     } catch (err) {
       console.error('Unexpected signup error:', err);
-      toast.error('An unexpected error occurred during signup');
       return { error: err };
     } finally {
       setLoading(false);
@@ -97,13 +107,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
       if (error) {
         console.error('Sign in error:', error);
-        toast.error(error.message);
         return { error };
       }
 
@@ -112,7 +121,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: null };
     } catch (err) {
       console.error('Unexpected sign in error:', err);
-      toast.error('An unexpected error occurred during sign in');
       return { error: err };
     } finally {
       setLoading(false);

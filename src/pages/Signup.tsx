@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Check, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,37 +27,87 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submitted with data:', { 
+      firstName: formData.firstName, 
+      lastName: formData.lastName, 
+      email: formData.email 
+    });
+
+    // Validate form
+    if (!formData.firstName.trim()) {
+      toast.error("First name is required");
+      return;
+    }
+
+    if (!formData.lastName.trim()) {
+      toast.error("Last name is required");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      toast.error("Email is required");
+      return;
+    }
+
+    if (!formData.password) {
+      toast.error("Password is required");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
 
     if (!isFormValid) {
+      toast.error("Please meet all password requirements");
       return;
     }
 
     setIsLoading(true);
-    console.log('Signup form submitted:', formData.email);
+    console.log('Attempting signup for:', formData.email);
 
-    const { error } = await signUp(
-      formData.email, 
-      formData.password, 
-      formData.firstName, 
-      formData.lastName
-    );
-    
-    if (!error) {
-      console.log('Signup successful, navigating to login');
-      navigate("/login");
+    try {
+      const { error } = await signUp(
+        formData.email.trim(), 
+        formData.password, 
+        formData.firstName.trim(), 
+        formData.lastName.trim()
+      );
+      
+      if (error) {
+        console.error('Signup error:', error);
+        toast.error(error.message || "Failed to create account");
+      } else {
+        console.log('Signup successful');
+        toast.success("Account created successfully! You can now sign in.");
+        // Clear form
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          confirmPassword: ""
+        });
+        // Navigate to login after a short delay
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      }
+    } catch (err) {
+      console.error('Unexpected signup error:', err);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const passwordRequirements = [
