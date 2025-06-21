@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,11 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     
     try {
-      // Use the current window origin for the redirect URL
-      const redirectUrl = `${window.location.origin}/`;
+      // First check if user already exists
+      const { data: existingUser } = await supabase.auth.admin.getUserByEmail?.(email) || {};
+      
+      // Use a more reliable redirect URL
+      const redirectUrl = `${window.location.origin}/login`;
       
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
         options: {
           emailRedirectTo: redirectUrl,
@@ -73,6 +75,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Signup error:', error);
+        
+        // Handle specific error cases
+        if (error.message.includes('User already registered')) {
+          toast.error('This email is already registered. Please try logging in instead.');
+          return { error: null }; // Don't treat this as an error for UI purposes
+        } else if (error.message.includes('Database error')) {
+          toast.error('There was an issue creating your account. Please try again in a few moments.');
+        } else if (error.message.includes('Invalid email')) {
+          toast.error('Please enter a valid email address.');
+        } else if (error.message.includes('Password')) {
+          toast.error('Password must be at least 6 characters long.');
+        } else {
+          toast.error(error.message || 'Failed to create account. Please try again.');
+        }
         return { error };
       }
 
@@ -82,19 +98,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         if (!data.user.email_confirmed_at) {
           console.log('User created, email confirmation required');
-          toast.success('Account created! Please check your email to confirm your account.');
+          toast.success('Account created! Please check your email to confirm your account before logging in.');
         } else {
           console.log('User created and confirmed');
-          toast.success('Account created successfully!');
+          toast.success('Account created successfully! You can now log in.');
         }
         return { error: null };
       } else {
         console.error('No user returned from signup');
+        toast.error('Account creation failed. Please try again.');
         return { error: new Error('Failed to create user account') };
       }
 
-    } catch (err) {
+    } catch (err: any) {
       console.error('Unexpected signup error:', err);
+      toast.error('An unexpected error occurred. Please try again.');
       return { error: err };
     } finally {
       setLoading(false);
@@ -107,20 +125,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) {
         console.error('Sign in error:', error);
+        
+        // Handle specific error cases
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Invalid email or password. Please check your credentials and try again.');
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Please confirm your email address before logging in.');
+        } else {
+          toast.error(error.message || 'Failed to sign in. Please try again.');
+        }
         return { error };
       }
 
       console.log('Sign in successful:', data);
       toast.success('Welcome back!');
       return { error: null };
-    } catch (err) {
+    } catch (err: any) {
       console.error('Unexpected sign in error:', err);
+      toast.error('An unexpected error occurred during sign in.');
       return { error: err };
     } finally {
       setLoading(false);

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ const Courses = () => {
       duration: "42 hours",
       image: "/placeholder.svg",
       price: 89,
-      price_inr: 7387, // 89 * 83
+      price_inr: 7387,
       category: "Web Development",
       level: "Beginner to Advanced",
       description: "Master HTML, CSS, JavaScript, React, Node.js, MongoDB, and deploy full-stack applications. Build 10+ real projects.",
@@ -128,10 +129,106 @@ const Courses = () => {
       description: "Build cross-platform mobile apps with React Native, Expo, Firebase, and publish to App Store & Play Store.",
       youtubePreview: "https://www.youtube.com/embed/0-S5a0eXPoc",
       features: ["3 Complete Apps", "App Store Deployment", "Firebase Integration", "Navigation"]
+    },
+    {
+      id: 7,
+      title: "Full Stack JavaScript Bootcamp",
+      instructor: "Robert Martinez",
+      rating: 4.8,
+      students: 11250,
+      duration: "50 hours",
+      image: "/placeholder.svg",
+      price: 129,
+      price_inr: 10707,
+      category: "Web Development",
+      level: "Intermediate to Advanced",
+      description: "Master MERN stack (MongoDB, Express, React, Node.js), authentication, deployment, and build 5 full-stack projects.",
+      youtubePreview: "https://www.youtube.com/embed/Zi-Q0t4gMC8",
+      features: ["5 Full-Stack Projects", "Authentication", "Deployment", "Real APIs"]
+    },
+    {
+      id: 8,
+      title: "AWS Cloud Solutions Architect",
+      instructor: "Amanda Foster",
+      rating: 4.7,
+      students: 6789,
+      duration: "40 hours",
+      image: "/placeholder.svg",
+      price: 149,
+      price_inr: 12367,
+      category: "Cloud Computing",
+      level: "Intermediate",
+      description: "Learn AWS services, serverless architecture, microservices, and prepare for AWS Solutions Architect certification.",
+      youtubePreview: "https://www.youtube.com/embed/3hLmDS179YE",
+      features: ["AWS Certification Prep", "Hands-on Labs", "Real Projects", "Career Support"]
+    },
+    {
+      id: 9,
+      title: "Cybersecurity Fundamentals",
+      instructor: "Mark Stevens",
+      rating: 4.6,
+      students: 4567,
+      duration: "35 hours",
+      image: "/placeholder.svg",
+      price: 119,
+      price_inr: 9877,
+      category: "Cybersecurity",
+      level: "Beginner to Intermediate",
+      description: "Learn ethical hacking, network security, penetration testing, and cybersecurity best practices for modern organizations.",
+      youtubePreview: "https://www.youtube.com/embed/U_P23SqJaDc",
+      features: ["Ethical Hacking", "Security Tools", "Penetration Testing", "Certification Path"]
+    },
+    {
+      id: 10,
+      title: "Blockchain & Cryptocurrency Development",
+      instructor: "Lisa Chen",
+      rating: 4.5,
+      students: 3456,
+      duration: "44 hours",
+      image: "/placeholder.svg",
+      price: 139,
+      price_inr: 11537,
+      category: "Blockchain",
+      level: "Advanced",
+      description: "Build decentralized applications (DApps), smart contracts with Solidity, and understand blockchain technology deeply.",
+      youtubePreview: "https://www.youtube.com/embed/gyMwXuJrbJQ",
+      features: ["Smart Contracts", "DApp Development", "Solidity", "Web3 Integration"]
+    },
+    {
+      id: 11,
+      title: "Advanced Excel & Data Analysis",
+      instructor: "Karen Wilson",
+      rating: 4.7,
+      students: 8901,
+      duration: "25 hours",
+      image: "/placeholder.svg",
+      price: 59,
+      price_inr: 4897,
+      category: "Data Analysis",
+      level: "Beginner to Intermediate",
+      description: "Master Excel formulas, pivot tables, VBA, Power Query, and create professional dashboards for business analytics.",
+      youtubePreview: "https://www.youtube.com/embed/Vl0H-qTclOg",
+      features: ["Advanced Formulas", "VBA Automation", "Dashboard Creation", "Business Cases"]
+    },
+    {
+      id: 12,
+      title: "Flutter Mobile App Development",
+      instructor: "James Rodriguez",
+      rating: 4.8,
+      students: 5678,
+      duration: "38 hours",
+      image: "/placeholder.svg",
+      price: 109,
+      price_inr: 9047,
+      category: "Mobile Development",
+      level: "Intermediate",
+      description: "Create beautiful native mobile apps for iOS and Android using Flutter and Dart. Deploy to app stores.",
+      youtubePreview: "https://www.youtube.com/embed/x0uinJvhNxI",
+      features: ["Cross-Platform Apps", "State Management", "Firebase Integration", "App Store Publishing"]
     }
   ];
 
-  const categories = ["All", "Web Development", "Data Science", "Marketing", "Programming", "Design", "Mobile Development"];
+  const categories = ["All", "Web Development", "Data Science", "Marketing", "Programming", "Design", "Mobile Development", "Cloud Computing", "Cybersecurity", "Blockchain", "Data Analysis"];
   const levels = ["All", "Beginner", "Intermediate", "Advanced", "All Levels"];
 
   const filteredCourses = courses.filter(course => {
