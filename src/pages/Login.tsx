@@ -24,11 +24,18 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.email || !formData.password) {
+      return;
+    }
+
     setIsLoading(true);
+    console.log('Login form submitted:', formData.email);
 
     const { error } = await signIn(formData.email, formData.password);
     
     if (!error) {
+      console.log('Login successful, navigating to:', from);
       navigate(from, { replace: true });
     }
     
@@ -106,28 +113,9 @@ const Login = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <Label htmlFor="remember" className="text-sm">
-                    Remember me
-                  </Label>
-                </div>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !formData.email || !formData.password}
                 className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white py-2.5"
               >
                 {isLoading ? (
@@ -148,7 +136,7 @@ const Login = () => {
                   to="/signup"
                   className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
                 >
-                  Sign up
+                  Create Account
                 </Link>
               </span>
             </div>

@@ -30,7 +30,12 @@ const Signup = () => {
       return;
     }
 
+    if (!isFormValid) {
+      return;
+    }
+
     setIsLoading(true);
+    console.log('Signup form submitted:', formData.email);
 
     const { error } = await signUp(
       formData.email, 
@@ -40,6 +45,7 @@ const Signup = () => {
     );
     
     if (!error) {
+      console.log('Signup successful, navigating to login');
       navigate("/login");
     }
     
@@ -62,7 +68,9 @@ const Signup = () => {
 
   const isFormValid = passwordRequirements.every(req => req.met) && 
                      formData.password === formData.confirmPassword &&
-                     formData.firstName && formData.lastName && formData.email;
+                     formData.firstName.trim() && 
+                     formData.lastName.trim() && 
+                     formData.email.trim();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center px-4 py-8">
@@ -198,26 +206,6 @@ const Signup = () => {
                 {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                   <p className="text-xs text-red-500">Passwords do not match</p>
                 )}
-              </div>
-
-              <div className="flex items-start space-x-2">
-                <input
-                  id="terms"
-                  type="checkbox"
-                  required
-                  disabled={isLoading}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
-                />
-                <Label htmlFor="terms" className="text-sm text-gray-600">
-                  I agree to the{" "}
-                  <Link to="/terms" className="text-blue-600 hover:underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link to="/privacy" className="text-blue-600 hover:underline">
-                    Privacy Policy
-                  </Link>
-                </Label>
               </div>
 
               <Button
